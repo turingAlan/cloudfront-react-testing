@@ -10,25 +10,25 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     env:
-    AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    AWS_DEFAULT_REGION: ap-south-1
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ap-south-1
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v2.5.1
-      with:
-        node-version: '20'
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2.5.1
+        with:
+          node-version: '20'
 
-    - name: Install packages
-      run: npm install
+      - name: Install packages
+        run: npm install
 
-    - name: Run build
-      run: npm run build
+      - name: Run build
+        run: npm run build
 
-    - name: Deploy
-      uses: lbertenasco/s3-deploy@v1
-      with:
-        folder: build
-        bucket: cloudfront-react-testing
-        dist-id: ${{ secrets.AWS_DISTRIBUTION_PRODUCTION }}
-        invalidation: /*
+      - name: Deploy
+        uses: lbertenasco/s3-deploy@v1
+        with:
+          folder: build
+          bucket: cloudfront-react-testing
+          dist-id: ${{ secrets.AWS_DISTRIBUTION_PRODUCTION }}
+          invalidation: /*
