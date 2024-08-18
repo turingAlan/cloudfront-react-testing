@@ -36,6 +36,8 @@ jobs:
         path: './build'
 
   deploy_to_production:
+  - name: List contents of dist directory
+    run: ls -R web-app-dist
     name: Deploy to S3 Production
     runs-on: ubuntu-latest
     needs: build
@@ -46,11 +48,11 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: web-app-dist
-        path: dist
+        path: build
 
     - name: Display structure of downloaded files
       run: ls -R
-      working-directory: dist
+      working-directory: build
 
     # S3 sync
     - name: S3 Sync
