@@ -37,15 +37,6 @@ jobs:
     - name: List contents of build directory
       run: ls -R build  # Change 'web-app-dist' to 'build' if your directory is named 'build'
 
-    - name: Download landing page artifact
-      uses: actions/download-artifact@v2
-      with:
-        name: build-artifact  # This should match the name used in the upload step
-        path: build  # Destination folder for the downloaded artifact
-
-    - name: Display structure of downloaded files
-      run: ls -R build
-
     # S3 sync
     - name: S3 Sync
       uses: jakejarvis/s3-sync-action@v0.5.1
