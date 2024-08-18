@@ -28,20 +28,12 @@ jobs:
     - name: Run build
       run: npm run build
 
-
     - name: Upload artifact
       uses: actions/upload-artifact@master
       with:
         name: web-app-dist
         path: './build'
 
-  deploy_to_production:
-    name: Deploy to S3 Production
-    runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: production
-    steps:
     - name: List contents of dist directory
       run: ls -R web-app-dist
 
