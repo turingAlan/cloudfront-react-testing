@@ -35,43 +35,43 @@ jobs:
         name: web-app-dist
         path: './build'
 
-  deploy_to_production:
-    name: Deploy to S3 Production
-    runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: production
-    steps:
-    - name: List contents of dist directory
-      run: ls -R web-app-dist
-    - name: Download landing page artifact
-      uses: actions/download-artifact@v2
-      with:
-        name: web-app-dist
-        path: build
+ deploy_to_production:
+  name: Deploy to S3 Production
+  runs-on: ubuntu-latest
+  needs: build
+  environment:
+    name: production
+  steps:
+  - name: List contents of dist directory
+    run: ls -R build
 
-    - name: Display structure of downloaded files
-      run: ls -R
-      working-directory: build
+  - name: Download landing page artifact
+    uses: actions/download-artifact@v2
+    with:
+      name: web-app-dist
+      path: build
 
-    # S3 sync
-    - name: S3 Sync
-      uses: jakejarvis/s3-sync-action@v0.5.1
-      with:
-        args: --acl public-read --follow-symlinks --delete
-      env:
-        AWS_S3_BUCKET: 'cloudfront-react-testing'
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_REGION: 'ap-south-1'   # optional: defaults to us-east-1
-        SOURCE_DIR: 'dist'      # optional: defaults to entire repository
+  - name: Display structure of downloaded files
+    run: ls -R build
 
-    # Invalidate Cloudfront
-    - name: Cloudfront Invalidation
-      uses: chetan/invalidate-cloudfront-action@master
-      env:
-        DISTRIBUTION: ${{ secrets.AWS_DISTRIBUTION_PRODUCTION }}
-        PATHS: '/*'
-        AWS_REGION: 'ap-south-1'
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  # S3 sync
+  - name: S3 Sync
+    uses: jakejarvis/s3-sync-action@v0.5.1
+    with:
+      args: --acl public-read --follow-symlinks --delete
+    env:
+      AWS_S3_BUCKET: 'cloudfront-react-testing'
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: 'ap-south-1'
+      SOURCE_DIR: 'build'  # Changed from 'dist' to 'build'
+
+  # Invalidate CloudFront
+  - name: CloudFront Invalidation
+    uses: chetan/invalidate-cloudfront-action@master
+    env:
+      DISTRIBUTION: ${{ secrets.AWS_DISTRIBUTION_PRODUCTION }}
+      PATHS: '/*'
+      AWS_REGION: 'ap-south-1'
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
