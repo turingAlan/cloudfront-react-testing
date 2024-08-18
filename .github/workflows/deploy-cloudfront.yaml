@@ -9,52 +9,26 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+      env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ap-south-1
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v2.5.1
       with:
         node-version: '20'
 
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ap-south-1
-
     - name: Install packages
       run: npm install
 
     - name: Run build
       run: npm run build
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@master
-      with:
-        name: build-artifact  # Changed the artifact name for clarity
-        path: './build'  # Assuming your build directory is named 'build'
-
-    - name: List contents of build directory
-      run: ls -R build  # Change 'web-app-dist' to 'build' if your directory is named 'build'
-
-    # S3 sync
-    - name: S3 Sync
-      uses: jakejarvis/s3-sync-action@v0.5.1
-      with:
-        args: --acl public-read --follow-symlinks --delete
-      env:
-        AWS_S3_BUCKET: 'cloudfront-react-testing'
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_REGION: 'ap-south-1'
-        SOURCE_DIR: 'build'  # Ensure this points to the correct directory
-
-    # Invalidate CloudFront
-    - name: CloudFront Invalidation
-      uses: chetan/invalidate-cloudfront-action@master
-      env:
-        DISTRIBUTION: ${{ secrets.AWS_DISTRIBUTION_PRODUCTION }}
-        PATHS: '/*'
-        AWS_REGION: 'ap-south-1'
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      
+    - name: Deploy
+          uses: lbertenasco/s3-deploy@v1
+          with:
+            folder: build
+            bucket: cloudfront-react-testing
+            dist-id: ${{ secrets.AWS_DISTRIBUTION_PRODUCTION }}
+            invalidation: /*
