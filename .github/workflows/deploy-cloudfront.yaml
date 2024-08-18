@@ -26,9 +26,9 @@ jobs:
       run: npm run build
 
     - name: Deploy
-          uses: lbertenasco/s3-deploy@v1
-          with:
-            folder: build
-            bucket: cloudfront-react-testing
-            dist-id: ${{ secrets.AWS_DISTRIBUTION_PRODUCTION }}
-            invalidation: /*
+      uses: lbertenasco/s3-deploy@v1
+      with:
+        folder: build
+        bucket: cloudfront-react-testing
+        dist-id: ${{ secrets.AWS_DISTRIBUTION_PRODUCTION }}
+        invalidation: /*
